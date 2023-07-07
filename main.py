@@ -31,6 +31,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
+    await bot.change_presence(activity=discord.Game(name="MS AI School"))
 
 @bot.event
 async def on_message(message):
