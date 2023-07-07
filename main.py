@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from datetime import datetime
 import json
 import os
 
@@ -18,9 +19,11 @@ print("TOKEN:", TOKEN)
 CHANNEL_ID = config_data["CHANNEL_ID"]
 print("CHANNEL_ID:", CHANNEL_ID)
 
-# 퀴즈 가져오기
+#오늘의 퀴즈 가져오기
 with open(quiz_file_path, "r", encoding="utf-8") as quiz_file:
     quiz_data = json.load(quiz_file)
+todayQuiz = quiz_data[datetime.now().strftime("%Y%m%d")+"quiz"]
+print("todayQuiz:", todayQuiz)
 
 
 intents = discord.Intents.default()
@@ -43,7 +46,7 @@ async def on_message(message):
     if message.content.startswith('!'):
         rowMes = message.content.replace('!', '', 1)
         if rowMes == '오늘의 문제':
-            await message.channel.send("# "+rowMes+"\n"+quiz_data["20230707quiz"])
+            await message.channel.send("# "+rowMes+"\n"+todayQuiz)
 
     await bot.process_commands(message)
 
