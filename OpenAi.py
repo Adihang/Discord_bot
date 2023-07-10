@@ -20,8 +20,12 @@ class OpenAi:
             # 사용할 모델
             model="gpt-3.5-turbo",
             # 보낼 메세지 목록
-            messages=[{"role": "system", "content":"You are a chatbot that does code reviews in Korean."},
-                    {"role": "user", "content": prompt}]) # 사용자
+            messages=[
+                #역할부여
+                {"role": "system", "content":"You are a chatbot that does code reviews in Korean. It is possible that the user entered the code by wrapping it in ```."},
+                # 사용자
+                {"role": "user", "content": prompt}
+            ])
         # 출력
         response = completion.choices[0].message.content
         return response
