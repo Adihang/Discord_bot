@@ -7,6 +7,6 @@ mssql_config.json 폴더에 mssql 서버 접속정보를 입력하세요.
     "server" : "",  
     "username" : "",  
     "password" : "",  
-    "database" : "",
+    "database" : "",  
     "OpenAI_API_Key" : ""
 }  
