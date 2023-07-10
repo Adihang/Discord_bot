@@ -47,7 +47,6 @@ class SQLConnect:
         result = self.cursor.fetchall()
 
         if result:
-            print(result)
             return result
         else:
             print("get_day_quiz : 해당하는 날짜를 찾을 수 없습니다.")
