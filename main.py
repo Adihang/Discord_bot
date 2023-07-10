@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from MessegeDef import MessageDef
 from sqlconnect import SQLConnect
+from OpenAi import OpenAi
 
 #MSSQLServer 에서 토큰 가져오기
 SQLConnect = SQLConnect()
@@ -31,9 +32,19 @@ async def on_message(message):
     if message.content.startswith('!'):
         rowMes = message.content.replace('!', '', 1)
         message_def = MessageDef()
-
-        if rowMes == '오늘의 문제':
-            await message.channel.send(message_def.todayQuiz())
+        if rowMes.find("ai ") == 0:
+            ai = OpenAi()
+            rowMes = rowMes.replace('ai ', '', 1)
+            if rowMes.find("코드리뷰") == 0:
+                rowMes = rowMes.replace('코드리뷰', '', 1)
+                print("코드리뷰 요청: " + rowMes)
+                await message.channel.send(ai.code_review(rowMes))
+            
+        if rowMes.find("오늘의 문제") == 0:
+            description, quizlist =  message_def.todayQuiz()
+            await message.channel.send(description)
+            for quiz in quizlist:
+                await message.channel.send(quiz)
 
     await bot.process_commands(message)
 

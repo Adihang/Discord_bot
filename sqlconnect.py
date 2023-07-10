@@ -6,15 +6,15 @@ class SQLConnect:
     def __init__(self):
         # mssql 접속정보 가져오기
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        mssql_config_file_path = os.path.join(script_dir, "mssql_config.json")
-        with open(mssql_config_file_path, "r", encoding="utf-8") as mssql_config_file:
-            mssql_config_data = json.load(mssql_config_file)
+        config_file_path = os.path.join(script_dir, "config.json")
+        with open(config_file_path, "r", encoding="utf-8") as config_file:
+            config_data = json.load(config_file)
             
-        server = mssql_config_data["server"]
-        #port = mssql_config_data["port"]
-        username = mssql_config_data["username"]
-        password = mssql_config_data["password"]
-        database = mssql_config_data["database"]
+        server = config_data["server"]
+        #port = config_data["port"]
+        username = config_data["username"]
+        password = config_data["password"]
+        database = config_data["database"]
 
         # MSSQL Server에 접속
         conn = pymssql.connect(server=server, user=username, password=password, database=database, charset='UTF-8')
