@@ -44,7 +44,10 @@ async def on_message(message):
             description, quizlist =  message_def.todayQuiz()
             await message.channel.send(description)
             for quiz in quizlist:
-                await message.channel.send(quiz)
+                msg = await message.channel.send(quiz)
+                await msg.add_reaction("⬆️")
+                await msg.add_reaction("👍")
+                await msg.add_reaction("⬇️")
 
     await bot.process_commands(message)
 
