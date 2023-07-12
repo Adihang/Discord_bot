@@ -1,6 +1,7 @@
 import pymssql
 import os
 import json
+from datetime import datetime
 
 class SQLConnect:
     def __init__(self):
@@ -31,13 +32,14 @@ class SQLConnect:
             print("MSSQL Server에 접속에 실패했습니다.")
 
     def get_token(self, ID):
-        self.cursor.execute("SELECT TOKEN, CHANNEL_ID FROM token WHERE name = '{}'".format(ID))
+        self.cursor.execute("SELECT TOKEN, CHANNEL_ID, serverid FROM token WHERE name = '{}'".format(ID))
         result = self.cursor.fetchone()
 
         if result:
             token = result[0]
             channel_id = result[1]
-            print(f"TOKEN: {token}\nCHANNEL_ID: {channel_id}")
+            server_id = result[2]
+            print(f"TOKEN: {token}\nCHANNEL_ID: {channel_id}\nSERVER_ID: {server_id}")
             return result
         else:
             print("get_token : 해당하는 ID를 찾을 수 없습니다.")
@@ -50,4 +52,14 @@ class SQLConnect:
             return result
         else:
             print("get_day_quiz : 해당하는 날짜를 찾을 수 없습니다.")
+            
+    def INSERT_quiz(self, id, name, tier):
+        sql = "INSERT INTO discord_bot.dbo.quiz (id, date, name, tier) VALUES ({}, '{}', '{}', '{}');"
+        self.cursor.execute(sql.format(id, str(datetime.now().strftime("%Y/%m/%d")), name, tier))
 
+    def get_quizs(self):
+        sql = "SELECT id FROM discord_bot.dbo.quiz;"
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        result = [(x[0]) for x in result]
+        return result

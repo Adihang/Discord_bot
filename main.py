@@ -3,12 +3,18 @@ from discord.ext import commands
 from MessegeDef import MessageDef
 from sqlconnect import SQLConnect
 from OpenAi import OpenAi
+# 반복 작업을 위한 패키지
+from discord.ext import tasks
+# 현재 시간을 받아와 구조체에 넣어주는 용도로 사용할 패키지
+import datetime
+import asyncio
 
 #MSSQLServer 에서 토큰 가져오기
 SQLConnect = SQLConnect()
 HB_TOKEN = SQLConnect.get_token("HB")
 TOKEN = HB_TOKEN[0]
 CHANNEL_ID = HB_TOKEN[1]
+SERVER_ID = HB_TOKEN[2]
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -18,46 +24,66 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
-    await bot.change_presence(activity=discord.Game(name="MS AI School"))
+    print(f"[!] 참가 중인 서버 : {len(bot.guilds)}개의 서버에 참여 중\n")
+    await bot.change_presence(activity=discord.Game(name = str(len(bot.guilds))+"개의 서버에 참여"))
+    
+    # 18시에 메세지를 보내는 함수를 실행하는 루프 생성
+    while True:
+        # 현재 시간을 가져옴
+        current_time = datetime.datetime.now().strftime('%H:%M')
+        print("\r"+ str(current_time), end="")
+        # 현재 시간이 18시일 때
+        if current_time == '18:00':
+            # 메세지를 보내는 함수 호출
+            await quiz_alarm()
+        # 1분 대기
+        await asyncio.sleep(60)
 
 #봇이 메세지를 읽었을 때
 @bot.event
-async def on_message(message):
+async def on_message(ctx):
 
     #봇이 자신의 메세지를 무시
-    if message.author == bot.user:
-        return
+    #if message.author == bot.user:
+    #    return
 
     #!로 시작하는 메세지를 읽으면
-    if message.content.startswith('!'):
-        rowMes = message.content.replace('!', '', 1)
+    if ctx.content.startswith('!'):
+        rowMes = ctx.content.replace('!', '', 1)
         message_def = MessageDef()
+        
         if rowMes.find("ai ") == 0:
             ai = OpenAi()
             rowMes = rowMes.replace('ai ', '', 1)
             if rowMes.find("코드리뷰") == 0:
                 rowMes = rowMes.replace('코드리뷰', '', 1)
-                print("코드리뷰 요청: " + rowMes)
-                await message.channel.send(ai.code_review(rowMes))
+                print(str(ctx.author)+"의 코드리뷰 요청: " + rowMes)
+                await ctx.channel.send(ai.code_review(rowMes))
+                
+        if rowMes.find("문제입력") == 0:
+            sql = SQLConnect()
+            rowMes = ctx.content.replace('문제입력 ', '', 1)
+            rowMes = list(rowMes.split())
+            sql.insert_quiz(int(rowMes[0]), str(rowMes[1]), str(rowMes[2]))
+            
             
         if rowMes.find("오늘의 문제") == 0:
+            rowMes = ctx.content.replace('오늘의 문제', '', 1)
+            #message_def.aiQuiz(rowMes)
+            
+            
             description, quizlist =  message_def.todayQuiz()
-            await message.channel.send(description)
-            for quiz in quizlist:
-                msg = await message.channel.send(quiz)
-                await msg.add_reaction("⬆️")
-                await msg.add_reaction("👍")
-                await msg.add_reaction("⬇️")
+            await ctx.channel.send(description)
+            if len(quizlist) > 0:
+                for quiz in quizlist:
+                    msg = await ctx.channel.send(quiz)
+                    await msg.add_reaction("⬆️")
+                    await msg.add_reaction("👍")
+                    await msg.add_reaction("⬇️")
+            print(str(ctx.author)+"의 오늘의 문제 요청: " + rowMes)
+    await bot.process_commands(ctx)
 
-    await bot.process_commands(message)
+async def quiz_alarm():
+    await bot.get_channel(int(CHANNEL_ID)).send('!오늘의 문제')
 
 bot.run(TOKEN)
-
-# 디스코드 봇이 읽어온 메시지는 message 변수에 저장됩니다. on_message 이벤트 핸들러 함수에서 message 매개변수는 봇이 수신한 각 메시지를 나타냅니다.
-
-# message 객체는 discord.Message 클래스의 인스턴스로, 메시지의 다양한 속성과 메서드를 사용하여 해당 메시지의 내용, 작성자, 채널 등의 정보에 접근할 수 있습니다. 명령어를 처리하거나 메시지에 응답하는 데 사용할 수 있는 유용한 기능을 제공합니다.
-
-# 예를 들어, message.content 속성은 메시지의 내용을 문자열로 가져올 수 있습니다. message.author 속성은 메시지를 작성한 사용자를 나타내는 discord.Member 객체를 반환합니다. 또한, message.channel 속성은 메시지가 속한 채널을 나타내는 discord.TextChannel 객체를 반환합니다.
-
-# message 객체의 다양한 속성과 메서드를 활용하여 메시지를 읽고 처리하는 로직을 구현할 수 있습니다.
-
