@@ -26,11 +26,15 @@ class MessageDef:
         openai = OpenAi()
         SqlConnect = SQLConnect()
         difficulty = list(difficulty.split())
+        print(str(difficulty))
         quizs = SqlConnect.get_quizs()
-        ai_quizs = openai.quiz_generator(difficulty, quizs)
-        # 문자열을 파이썬 객체로 변환
-        parsed_list = ast.literal_eval(ai_quizs)
-        # 2차원 배열로 변환
-        two_dimensional_array = [list(item) for item in parsed_list]
-        return two_dimensional_array
+        print(str(quizs))
+        # ai_quizs = openai.quiz_generator(difficulty, quizs)
+        # # 문자열을 파이썬 객체로 변환
+        # parsed_list = ast.literal_eval(ai_quizs)
+        # # 2차원 배열로 변환
+        # two_dimensional_array = [list(item) for item in parsed_list]
+        # return two_dimensional_array
+difficulty = 'bronze2 bronze3'
 mes = MessageDef()
+mes.aiQuiz(difficulty)

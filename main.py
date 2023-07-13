@@ -12,6 +12,8 @@ import asyncio
 #MSSQLServer 에서 토큰 가져오기
 SQLConnect = SQLConnect()
 HB_TOKEN = SQLConnect.get_token("HB")
+chackInOut_CHANNEL = SQLConnect.get_token("체크인아웃-알림")
+chackInOut_CHANNEL_ID = chackInOut_CHANNEL[1]
 TOKEN = HB_TOKEN[0]
 CHANNEL_ID = HB_TOKEN[1]
 SERVER_ID = HB_TOKEN[2]
@@ -34,10 +36,24 @@ async def on_ready():
         print("\r"+ str(current_time), end="")
         # 현재 시간이 18시일 때
         if current_time == '18:00':
-            # 메세지를 보내는 함수 호출
             await quiz_alarm()
+        if current_time == '8:45':
+            await check_in_alarm()
+        elif current_time == '12:55':
+            await middle_check_in_alarm()
+        elif current_time == '17:51':
+            await check_out_alarm() 
         # 1분 대기
         await asyncio.sleep(60)
+async def check_in_alarm():
+    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크인 시간입니다!\nhttps://forms.microsoft.com/r/9XAGQUWB7C')
+async def middle_check_in_alarm():
+    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('중간 체크인 시간입니다!\nhttps://forms.microsoft.com/r/C9xiFYmixV')
+async def check_out_alarm():
+    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크아웃 시간입니다!\nhttps://forms.microsoft.com/r/00Ny5wfGKz')
+async def quiz_alarm():
+    await bot.get_channel(int(CHANNEL_ID)).send('!오늘의 문제')
+
 
 #봇이 메세지를 읽었을 때
 @bot.event
@@ -82,8 +98,5 @@ async def on_message(ctx):
                     await msg.add_reaction("⬇️")
             print(str(ctx.author)+"의 오늘의 문제 요청: " + rowMes)
     await bot.process_commands(ctx)
-
-async def quiz_alarm():
-    await bot.get_channel(int(CHANNEL_ID)).send('!오늘의 문제')
 
 bot.run(TOKEN)
