@@ -6,7 +6,7 @@ from OpenAi import OpenAi
 # 반복 작업을 위한 패키지
 from discord.ext import tasks
 # 현재 시간을 받아와 구조체에 넣어주는 용도로 사용할 패키지
-import datetime
+from datetime import datetime
 import asyncio
 
 #MSSQLServer 에서 토큰 가져오기
@@ -32,18 +32,26 @@ async def on_ready():
     # 18시에 메세지를 보내는 함수를 실행하는 루프 생성
     while True:
         # 현재 시간을 가져옴
-        current_time = datetime.datetime.now().strftime('%H:%M')
-        print("\r"+ str(current_time), end="")
-        # 현재 시간이 18시일 때
-        if current_time == '18:00':
-            await quiz_alarm()
-        if current_time == '8:45':
-            await check_in_alarm()
-        elif current_time == '12:55':
-            await middle_check_in_alarm()
-        elif current_time == '17:51':
-            await check_out_alarm() 
-        # 1분 대기
+        current_time = datetime.now().strftime('%H:%M')
+        await bot.change_presence(activity=discord.Game(name = str(current_time)))
+        if datetime.now().weekday() >= 5:
+            print("\r"+str(datetime.now().weekday())+"주말"+ str(current_time), end="")
+        else:
+            # 현재 시간이 18시일 때
+            if current_time == '18:00':
+                await quiz_alarm()
+            elif current_time == '8:45':
+                print('\r체크인 시간입니다!\n')
+                await check_in_alarm()
+            elif current_time == '12:55':
+                print('\r중간 체크인 시간입니다!\n')
+                await middle_check_in_alarm()
+            elif current_time == '17:51':
+                print('\r체크아웃 시간입니다!\n')
+                await check_out_alarm()
+            else:
+                print("\r"+str(datetime.now().weekday())+"평일"+ str(current_time), end="")
+            # 1분 대기
         await asyncio.sleep(60)
 async def check_in_alarm():
     await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크인 시간입니다!\nhttps://forms.microsoft.com/r/9XAGQUWB7C')
