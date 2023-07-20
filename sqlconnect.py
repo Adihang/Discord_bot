@@ -45,7 +45,7 @@ class SQLConnect:
             print("get_token : 해당하는 ID를 찾을 수 없습니다.")
 
     def get_day_quiz(self, date):
-        self.cursor.execute("SELECT id, CAST(name AS NVARCHAR), tier FROM quiz WHERE date = '{}'".format(date))
+        self.cursor.execute("SELECT id, CAST(name AS NVARCHAR), tier, QuizSite FROM quiz WHERE date = '{}'".format(date))
         result = self.cursor.fetchall()
 
         if result:

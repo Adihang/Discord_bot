@@ -17,7 +17,13 @@ class MessageDef:
             today_quiz_DB = SqlConnect.get_day_quiz(today)
             quizlist =[]
             for i in today_quiz_DB:
-                quizlist.append("**" + i[1] + "**" + "\n" + "solved.ac_Tier : " + i[2] + "\n" +  "https://www.acmicpc.net/problem/" + str(i[0]))
+                if i[3] == 'Beakjoon':
+                    link = "https://www.acmicpc.net/problem/"
+                elif i[3] == 'programmers':
+                    link = "https://school.programmers.co.kr/learn/courses/30/lessons/"
+                else:
+                    link = ""
+                quizlist.append("**" + i[1] + "**" + "\n" + "난이도 : " + i[2] + "\n" +  link + str(i[0]))
         print(quizlist)
         return description, quizlist
     
