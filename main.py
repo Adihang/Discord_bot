@@ -5,7 +5,6 @@ from sqlconnect import SQLConnect
 from OpenAi import OpenAi
 # 반복 작업을 위한 패키지
 from discord.ext import tasks
-# 현재 시간을 받아와 구조체에 넣어주는 용도로 사용할 패키지
 from datetime import datetime
 import asyncio
 
@@ -40,7 +39,7 @@ async def on_ready():
             # 현재 시간이 18시일 때
             if current_time == '18:00':
                 await quiz_alarm()
-            elif current_time == '8:45':
+            elif current_time == '08:45':
                 print('\r체크인 시간입니다!\n')
                 await check_in_alarm()
             elif current_time == '12:55':
