@@ -83,18 +83,20 @@ async def on_message(ctx):
                 print(str(ctx.author)+"의 코드리뷰 요청: " + rowMes)
                 await ctx.channel.send(ai.code_review(rowMes))
                 
-        if rowMes.find("문제입력") == 0:
-            sql = SQLConnect()
-            rowMes = ctx.content.replace('문제입력 ', '', 1)
+        elif rowMes.find("문제입력 ") == 0:
+            rowMes = ctx.content.replace('!문제입력 ', '', 1)
             rowMes = list(rowMes.split())
-            sql.insert_quiz(int(rowMes[0]), str(rowMes[1]), str(rowMes[2]))
+            print(str(ctx.author) + "의 문제입력 요청: "+str(rowMes))
+            message_def.insert_quiz(rowMes)
+            
+        elif rowMes.find("문제입력방법") == 0:
+            print(str(ctx.author)+"의 문제입력방법 요청")
+            await ctx.channel.send('문제 입력 방법은 다음과 같습니다.\n!문제입력 <id> <name> <difficulty> <Beakjoon OR programmers>')
             
             
-        if rowMes.find("오늘의 문제") == 0:
+        elif rowMes.find("오늘의 문제") == 0:
             rowMes = ctx.content.replace('오늘의 문제', '', 1)
             #message_def.aiQuiz(rowMes)
-            
-            
             description, quizlist =  message_def.todayQuiz()
             await ctx.channel.send(description)
             if len(quizlist) > 0:
