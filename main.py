@@ -87,7 +87,9 @@ async def on_message(ctx):
             rowMes = ctx.content.replace('!문제입력 ', '', 1)
             rowMes = list(rowMes.split())
             print(str(ctx.author) + "의 문제입력 요청: "+str(rowMes))
-            message_def.insert_quiz(rowMes)
+            status = message_def.insert_quiz(rowMes)
+            if status:
+                await ctx.channel.send("문제가 정상적으로 추가되었습니다.")
             
         elif rowMes.find("문제입력방법") == 0:
             print(str(ctx.author)+"의 문제입력방법 요청")

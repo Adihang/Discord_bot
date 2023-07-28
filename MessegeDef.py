@@ -31,7 +31,7 @@ class MessageDef:
     
     def insert_quiz(self, rowMes):
         SqlConnect = SQLConnect()
-        SqlConnect.INSERT_quiz(str(rowMes[0]), str(rowMes[1]), str(rowMes[2]), str(rowMes[3]))
+        return SqlConnect.INSERT_quiz(str(rowMes[0]), str(rowMes[1]), str(rowMes[2]), str(rowMes[3]))
     
     #ai 퀴즈 처리
     def aiQuiz(self, difficulty):

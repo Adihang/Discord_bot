@@ -62,9 +62,11 @@ class SQLConnect:
             sql = "INSERT INTO discord_bot.dbo.quiz (id, date, name, tier, QuizSite) VALUES ('{}', '{}', '{}', '{}', '{}');"
             self.cursor.execute(sql.format(id, str(datetime.now().strftime("%Y-%m-%d")), name, tier, QuizSite))
             self.conn.commit()
+            return True
             print("문제가 정상적으로 추가되었습니다.")
         except Exception as e:
             print(f"문제 추가 오류: {e}")
+            return False
 
     def get_quizs(self):
         sql = "SELECT id FROM discord_bot.dbo.quiz;"
