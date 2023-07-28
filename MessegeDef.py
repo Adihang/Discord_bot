@@ -24,7 +24,7 @@ class MessageDef:
                 else:
                     link = ""
                 quizlist.append("**" + i[1] + "**" + "\n" + "난이도 : " + i[2] + "\n" +  link + str(i[0]))
-        print(quizlist)
+        print('quizlist: '+quizlist)
         return description, quizlist
     
     #ai 퀴즈 처리
@@ -32,15 +32,15 @@ class MessageDef:
         openai = OpenAi()
         SqlConnect = SQLConnect()
         difficulty = list(difficulty.split())
-        print(str(difficulty))
+        # print(str(difficulty))
         quizs = SqlConnect.get_quizs()
-        print(str(quizs))
+        # print(str(quizs))
         # ai_quizs = openai.quiz_generator(difficulty, quizs)
         # # 문자열을 파이썬 객체로 변환
         # parsed_list = ast.literal_eval(ai_quizs)
         # # 2차원 배열로 변환
         # two_dimensional_array = [list(item) for item in parsed_list]
         # return two_dimensional_array
-difficulty = 'bronze2 bronze3'
-mes = MessageDef()
-mes.aiQuiz(difficulty)
+# difficulty = 'bronze2 bronze3'
+# mes = MessageDef()
+# mes.aiQuiz(difficulty)
