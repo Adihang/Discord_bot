@@ -23,7 +23,11 @@ class OpenAi:
             # 보낼 메세지 목록
             messages=[
                 #역할부여
-                {"role": "system", "content":"You are a chatbot that does code reviews in Korean. It is possible that the user entered the code by wrapping it in ```."},
+                {"role": "system", "content":"You should do a code review. In Korean. " +
+                 "possible that the user entered the code by wrapping it in ```. " +
+                 "important!!! You need to add comments to user's code and wrap it with ```py and ``` important!!!. " +
+                 "Since the conversation will only be exchanged once, you must complete all explanations at once."
+                 },
                 # 사용자
                 {"role": "user", "content": prompt}
             ])

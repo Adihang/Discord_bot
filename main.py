@@ -12,7 +12,9 @@ import asyncio
 SQLConnect = SQLConnect()
 HB_TOKEN = SQLConnect.get_token("HB")
 chackInOut_CHANNEL = SQLConnect.get_token("체크인아웃-알림")
+quiz_CHANNEL = SQLConnect.get_token("quiz")
 chackInOut_CHANNEL_ID = chackInOut_CHANNEL[1]
+quiz_CHANNEL_ID = quiz_CHANNEL[1]
 TOKEN = HB_TOKEN[0]
 CHANNEL_ID = HB_TOKEN[1]
 SERVER_ID = HB_TOKEN[2]
@@ -53,13 +55,13 @@ async def on_ready():
             # 1분 대기
         await asyncio.sleep(60)
 async def check_in_alarm():
-    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크인 시간입니다!\nhttps://forms.microsoft.com/r/9XAGQUWB7C')
+    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크인 시간입니다!\nhttps://forms.office.com/r/0kkzXxYA2m')
 async def middle_check_in_alarm():
-    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('중간 체크인 시간입니다!\nhttps://forms.microsoft.com/r/C9xiFYmixV')
+    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('중간 체크인 시간입니다!\nhttps://forms.office.com/r/wVa9e9gX6f')
 async def check_out_alarm():
-    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크아웃 시간입니다!\nhttps://forms.microsoft.com/r/00Ny5wfGKz')
+    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크아웃 시간입니다!\nhttps://forms.office.com/r/CWYbbA040X')
 async def quiz_alarm():
-    await bot.get_channel(int(CHANNEL_ID)).send('!오늘의 문제')
+    await bot.get_channel(int(quiz_CHANNEL_ID)).send('!오늘의 문제')
 
 
 #봇이 메세지를 읽었을 때

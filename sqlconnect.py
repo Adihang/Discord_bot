@@ -43,7 +43,7 @@ class SQLConnect:
             token = result[0]
             channel_id = result[1]
             server_id = result[2]
-            print(f"TOKEN: {token}\nCHANNEL_ID: {channel_id}\nSERVER_ID: {server_id}")
+            print(f"ID: {ID}\nTOKEN: {token}\nCHANNEL_ID: {channel_id}\nSERVER_ID: {server_id}")
             return result
         else:
             print("get_token : 해당하는 ID를 찾을 수 없습니다.")
