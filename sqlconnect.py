@@ -55,15 +55,50 @@ class SQLConnect:
         if result:
             return result
         else:
+            result=[]
             print("get_day_quiz : 해당하는 날짜를 찾을 수 없습니다.")
+            result.append('none')
+            return result
+        
+    def get_random_quiz(self, tier):
+        self.cursor.execute("SELECT id, CAST(name AS NVARCHAR), tier FROM beakjun_quiz WHERE tier = '{}'".format(str(tier)))
+        result = self.cursor.fetchall()
+        return result
+        
 
     def INSERT_quiz(self, id, name, tier, QuizSite):
         try:
             sql = "INSERT INTO discord_bot.dbo.quiz (id, date, name, tier, QuizSite) VALUES ('{}', '{}', '{}', '{}', '{}');"
             self.cursor.execute(sql.format(id, str(datetime.now().strftime("%Y-%m-%d")), name, tier, QuizSite))
             self.conn.commit()
+            print(f"문제가 정상적으로 추가되었습니다 : {id}")
             return True
-            print("문제가 정상적으로 추가되었습니다.")
+        except Exception as e:
+            print(f"문제 추가 오류: {e}")
+            return False
+        
+    def INSERT_quiz_tags(self, id):
+        try:
+            self.cursor.execute(f"SELECT ko_tags FROM beakjun_quiz WHERE id = '{id}'")
+            result = self.cursor.fetchone()
+            tags = json.loads(result[0])
+            for tag in tags:
+                sql = "INSERT INTO discord_bot.dbo.beakjun_quiz_tags (id, ko_tags) VALUES ('{}', '{}');"
+                self.cursor.execute(sql.format(id, tag))
+                self.conn.commit()
+                print(f"태그가 정상적으로 추가되었습니다. : {id}, {tag}")
+        except Exception as e:
+            print(f"태그 추가 오류: {e}")
+            return False
+            
+        
+    def INSERT_quiz_info(self, id, name, tier, ko_tags, en_tags):
+        try:
+            sql = "INSERT INTO discord_bot.dbo.beakjun_quiz (id, name, tier, ko_tags, en_tags) VALUES ('{}', '{}', '{}', '{}', '{}');"
+            self.cursor.execute(sql.format(id, name, tier, json.dumps(ko_tags, ensure_ascii=False), json.dumps(en_tags, ensure_ascii=False)))
+            self.conn.commit()
+            print(f"문제가 정상적으로 추가되었습니다. : {id}")
+            return True
         except Exception as e:
             print(f"문제 추가 오류: {e}")
             return False
@@ -74,6 +109,3 @@ class SQLConnect:
         result = self.cursor.fetchall()
         result = [(x[0]) for x in result]
         return result
-#sqlc = SQLConnect()
-#sqlc.INSERT_quiz('0000', '테스트퀴즈', 'test', 'test')
-# print(sqlc.get_day_quiz('20230728'))

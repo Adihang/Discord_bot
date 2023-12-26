@@ -7,6 +7,8 @@ from OpenAi import OpenAi
 from discord.ext import tasks
 from datetime import datetime
 import asyncio
+import random
+from collections import Counter
 
 #MSSQLServer 에서 토큰 가져오기
 SQLConnect = SQLConnect()
@@ -22,6 +24,7 @@ SERVER_ID = HB_TOKEN[2]
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
+votes = dict()
 
 #봇이 켜졌을 때
 @bot.event
@@ -41,28 +44,32 @@ async def on_ready():
             # 현재 시간이 18시일 때
             if current_time == '18:00':
                 await quiz_alarm()
-            elif current_time == '08:45':
-                print('\r체크인 시간입니다!\n')
-                await check_in_alarm()
-            elif current_time == '12:55':
-                print('\r중간 체크인 시간입니다!\n')
-                await middle_check_in_alarm()
-            elif current_time == '17:51':
-                print('\r체크아웃 시간입니다!\n')
-                await check_out_alarm()
+            elif current_time == '09:00':
+                await vote_messege()
             else:
                 print("\r"+str(datetime.now().weekday())+"평일"+ str(current_time), end="")
             # 1분 대기
         await asyncio.sleep(60)
-async def check_in_alarm():
-    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크인 시간입니다!\nhttps://forms.office.com/r/0kkzXxYA2m')
-async def middle_check_in_alarm():
-    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('중간 체크인 시간입니다!\nhttps://forms.office.com/r/wVa9e9gX6f')
-async def check_out_alarm():
-    await bot.get_channel(int(chackInOut_CHANNEL_ID)).send('체크아웃 시간입니다!\nhttps://forms.office.com/r/CWYbbA040X')
+async def vote_messege():
+    embed = discord.Embed(title = "소중한 한표 행사하세요!",
+        description = "투표방법은 다음과 같습니다.\n!투표 <원하는 난이도>")
+    embed.add_field(name = "브론즈", value = "1~5")
+    embed.add_field(name = "실버", value = "6~10")
+    embed.add_field(name = "골드", value = "11~15")
+    await bot.get_channel(int(quiz_CHANNEL_ID)).send(embed = embed)
 async def quiz_alarm():
-    await bot.get_channel(int(quiz_CHANNEL_ID)).send('!오늘의 문제')
+    message_def = MessageDef()
+    description, quizlist =  message_def.todayQuiz(7)
+    if len(quizlist) > 0:
+        await bot.get_channel(int(quiz_CHANNEL_ID)).send('!오늘의문제')
 
+
+@bot.command()
+async def 문제입력방법(ctx):
+    embed = discord.Embed(title = "문제 입력 방법",
+        description = "!문제입력 <id> <name> <difficulty> <Beakjoon OR programmers>")
+    embed.set_footer(text = "입력된 문제 중 2개가 랜덤으로 선택됩니다.")
+    await ctx.channel.send(embed = embed)
 
 #봇이 메세지를 읽었을 때
 @bot.event
@@ -81,7 +88,7 @@ async def on_message(ctx):
             ai = OpenAi()
             rowMes = rowMes.replace('ai ', '', 1)
             if rowMes.find("코드리뷰") == 0:
-                rowMes = rowMes.replace('코드리뷰', '', 1)
+                rowMes = rowMes.replace('!코드리뷰', '', 1)
                 print(str(ctx.author)+"의 코드리뷰 요청: " + rowMes)
                 await ctx.channel.send(ai.code_review(rowMes))
                 
@@ -92,24 +99,40 @@ async def on_message(ctx):
             status = message_def.insert_quiz(rowMes)
             if status:
                 await ctx.channel.send("문제가 정상적으로 추가되었습니다.")
+                
+        elif rowMes.find('투표 ') == 0:
+            rowMes = ctx.content.replace('!투표 ', '', 1)
+            embed = discord.Embed(title = "소중한 한표 감사합니다!",
+                description = f'{ctx.author}님 난이도 {rowMes}에 투표하셨습니다.')
+            votes[str(ctx.author)] = int(rowMes)
+            embed.set_footer(text = f"{ctx.author}")
+            await ctx.channel.send(embed = embed)
+            print(votes)
+        
+        elif rowMes.find('오늘의문제') == 0:
+            message_def = MessageDef()
+            levels = votes.values()
             
-        elif rowMes.find("문제입력방법") == 0:
-            print(str(ctx.author)+"의 문제입력방법 요청")
-            await ctx.channel.send('문제 입력 방법은 다음과 같습니다.\n!문제입력 <id> <name> <difficulty> <Beakjoon OR programmers>')
+            counts = Counter(levels)
+            max_count = max(counts.values())
+            most_common_values = [key for key, value in counts.items() if value == max_count]
+            selected_level = random.choice(most_common_values)
             
-            
-        elif rowMes.find("오늘의 문제") == 0:
-            rowMes = ctx.content.replace('오늘의 문제', '', 1)
-            #message_def.aiQuiz(rowMes)
-            description, quizlist =  message_def.todayQuiz()
-            await ctx.channel.send(description)
+            description, quizlist =  message_def.todayQuiz(selected_level)
+            description.set_footer(text = f"{ctx.author}")
+            await ctx.channel.send(embed = description)
             if len(quizlist) > 0:
                 for quiz in quizlist:
                     msg = await ctx.channel.send(quiz)
                     await msg.add_reaction("⬆️")
                     await msg.add_reaction("👍")
                     await msg.add_reaction("⬇️")
-            print(str(ctx.author)+"의 오늘의 문제 요청: " + rowMes)
+            
+
+            
+            
+
+                  
     await bot.process_commands(ctx)
 
 bot.run(TOKEN)
