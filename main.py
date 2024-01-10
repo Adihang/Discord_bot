@@ -114,9 +114,13 @@ async def on_message(ctx):
             levels = votes.values()
             
             counts = Counter(levels)
-            max_count = max(counts.values())
-            most_common_values = [key for key, value in counts.items() if value == max_count]
-            selected_level = random.choice(most_common_values)
+            try:
+                max_count = max(counts.values())
+                most_common_values = [key for key, value in counts.items() if value == max_count]
+                selected_level = random.choice(most_common_values)
+            except:
+                selected_level = 6
+            
             
             description, quizlist =  message_def.todayQuiz(selected_level)
             description.set_footer(text = f"{ctx.author}")
